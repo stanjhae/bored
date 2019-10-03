@@ -1,26 +1,36 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect } from 'react'
+import { Switch, Route } from 'react-router-dom'
+import { Provider } from 'react-redux'
+import { ConnectedRouter } from 'connected-react-router'
+import { store, history } from './redux/store'
+import Activity from './components/Activity/Activity'
+import List from './components/List'
+import 'rsuite/dist/styles/rsuite-default.css'
+import Navbarr from './components/Navbar'
 
-function App() {
+const { dispatch } = store
+
+const App = () => {
+  useEffect(() => {
+    const init = async () => {
+      const activities = await localStorage.getItem('activities')
+      if (activities) dispatch.bored.saveActivitySuccess(JSON.parse(activities))
+      dispatch.bored.getActivity()
+    }
+    init().then()
+  }, [])
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    <Provider store={store}>
+      <ConnectedRouter history={history}>
+        <Navbarr/>
+        <Switch>
+          <Route exact path='/' component={Activity}/>
+          <Route exact path='/list' component={List}/>
+        </Switch>
+      </ConnectedRouter>
+    </Provider>
+  )
 }
 
-export default App;
+export default App
